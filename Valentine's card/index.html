@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Card</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="main-card">
+            <h1>Will you be my Valentine?</h1>
+            <div class="heart">❤️</div>
+            <div class="button-container">
+                <button class="yes-btn" onclick="handleYes()">Yes</button>
+                <button class="no-btn" onclick="handleNo()">No</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cat-screen" id="catScreen">
+        <img src="sources/images/cat_gun.png" alt="Cat with gun" class="cat-image">
+        <div class="cat-text">Don't play with me</div>
+    </div>
+
+    <div class="happy-screen" id="happyScreen">
+        <img src="sources/images/love.png" alt="Love" class="happy-image">
+        <div class="happy-text">Happy Valentines My Love! 💕</div>
+    </div>
+
+    <script>
+        let noClickCount = 0;
+        const noBtn = document.querySelector('.no-btn');
+        const catScreen = document.getElementById('catScreen');
+        const happyScreen = document.getElementById('happyScreen');
+        const container = document.querySelector('.container');
+
+        function getRandomPosition() {
+            const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+            return { x: randomX, y: randomY };
+        }
+
+        function handleNo() {
+            noClickCount++;
+
+            if (noClickCount < 3) {
+                // Move button to random location
+                const position = getRandomPosition();
+                noBtn.style.position = 'fixed';
+                noBtn.style.left = position.x + 'px';
+                noBtn.style.top = position.y + 'px';
+            } else if (noClickCount === 3) {
+                // Show cat screen
+                catScreen.classList.add('show');
+                setTimeout(() => {
+                    catScreen.classList.remove('show');
+                    resetCard();
+                }, 2000);
+            }
+        }
+
+        function resetCard() {
+            noClickCount = 0;
+            noBtn.style.position = 'relative';
+            noBtn.style.left = '0';
+            noBtn.style.top = '0';
+        }
+
+        function handleYes() {
+            happyScreen.classList.add('show');
+            createConfetti();
+        }
+
+        function createConfetti() {
+            const colors = ['#ff1744', '#ff5252', '#ff8a80', '#ffeb3b', '#ffd54f', '#ffb74d'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * window.innerWidth + 'px';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                document.body.appendChild(confetti);
+
+                animateConfetti(confetti);
+            }
+        }
+
+        function animateConfetti(element) {
+            const duration = 3 + Math.random() * 2;
+            const xMovement = (Math.random() - 0.5) * 300;
+            const yMovement = window.innerHeight + 100;
+            const rotation = Math.random() * 720;
+
+            element.animate([
+                {
+                    transform: `translateX(0) translateY(0) rotate(0deg)`,
+                    opacity: 1
+                },
+                {
+                    transform: `translateX(${xMovement}px) translateY(${yMovement}px) rotate(${rotation}deg)`,
+                    opacity: 0
+                }
+            ], {
+                duration: duration * 1000,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            });
+
+            setTimeout(() => element.remove(), duration * 1000);
+        }
+
+        // Prevent no button from going off-screen on window resize
+        window.addEventListener('resize', () => {
+            if (noClickCount > 0 && noClickCount < 3) {
+                const position = getRandomPosition();
+                noBtn.style.left = position.x + 'px';
+                noBtn.style.top = position.y + 'px';
+            }
+        });
+    </script>
+</body>
+</html>
